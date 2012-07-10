@@ -1,0 +1,41 @@
+<?php
+
+// Base DB Info.
+$dbHost = 'localhost';
+$dbName = 'oculi';
+$dbUser = 'readonly';
+$dbPass = 'readonly';
+
+// Locations
+$siteList = array(
+                 'AK'   => "Akerley||10.1.%.%",
+                 'AM'   => "Amherst||10.2.%.%",
+                 'AN'   => "AVCM||10.3.%.%",
+                 'CE'   => "Central||10.4.%.%",
+                 'CO'   => "AVCL||10.5.%.%", 
+                 'CL'	=> "Chain Lake||10.6.%.%",
+                 'BU'   => "Burridge||10.7.%.%",
+                 'CU'   => "Cumberland||10.8.%.%",
+                 'DG'	=> "Dartmouth Gate||10.9.%.%",
+                 'DI'   => "Digby||10.10.%.%",
+                 'IN'   => "Institute||10.11.%.%",
+                 'KI'   => "Kingstec||10.12.%.%",
+                 'LU'   => "Lunenburg||10.13.%.%",
+                 'MA'   => "Marconi||10.14.%.%",
+                 'PI'   => "Pictou||10.15.%.%",
+                 'SH'   => "Shelburne||10.16.%.%",
+                 'ST'   => "Strait Area||10.17.%.%",
+                 'TR'   => "Truro||10.18.%.%",
+                 'DW'   => "Waterfront||10.19.%.%",
+                 'NSCC' => "Servers||10.%.20.%",
+                 '01' 	=> "Offsite||",
+                 'All'   => "All||Null",
+);
+
+$chartArgs = array(
+                 0 => "Antivirus||av||#cc0000",
+                 1 => "Windows Updates||os||#FAC61B",
+                 2 => "Inventory||in||#c9c9c9",
+);
+
+?>
