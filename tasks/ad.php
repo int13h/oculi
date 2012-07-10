@@ -1,7 +1,8 @@
 #!/usr/local/bin/php
 <?php
 
-$debug = 0;
+$debug = 1;
+$test = 9;
 $timestamp = date('Y-m-d H:i:s');
 $base = dirname(__FILE__);
 $patch_dir = '/data/PATCHES';
