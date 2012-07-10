@@ -1,0 +1,9 @@
+# Main processor and AD sync
+0       */4     *       *       *       /Code/Oculi/process.php `date "+\%Y-\%m-\%d"` > /dev/null 2>&1
+0       */4     *       *       *       /Code/Oculi/ad.php `date "+\%Y-\%m-\%d"` > /dev/null 2>&1
+
+# Day end processor
+45      0       *       *       *       /Code/Oculi/process.php `date -v-1d "+\%Y-\%m-\%d"` > /dev/null 2>&1
+
+# Summary stats
+0       0       *       *       *       /Code/Oculi/metrics.php > /dev/null 2>&1
