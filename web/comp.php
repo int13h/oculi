@@ -183,7 +183,7 @@ function getChar($rowSev) {
 
 function processQuery($theQuery,$theCols,$totalHosts) {
 
-    global $siteList, $osVersions, $qTypes, $siteName, $qType, $rfText, $hSev, $mSev, $lSev;
+    global $base, $siteList, $osVersions, $qTypes, $siteName, $qType, $rfText, $hSev, $mSev, $lSev;
 
     $rC = $hostCount = $hSev = $mSev = $lSev = $cinToday = 0;
     $site = explode("||", $siteList[$siteName]);
@@ -558,7 +558,7 @@ function processQuery($theQuery,$theCols,$totalHosts) {
                   \r</tr>\n";
 
             $helper = "\r<tr>\n
-                       \r<td align=center colspan=4><img src=.inc/compliance/pt.png><br><br></td>\n
+                       \r<td align=center colspan=4><img src=pt.png><br><br></td>\n
                        \r</tr>\n";
 
             echo "</table>\n";
