@@ -23,6 +23,8 @@
 //
 
 $base = dirname(__FILE__);
+$root = $_SERVER['DOCUMENT_ROOT'];
+$webdir = str_replace("$root", '',$base);
 include "$base/config.php";
 include "$base/functions.php";
 
@@ -205,7 +207,7 @@ function getChar($rowSev) {
 
 function processQuery($theQuery,$theCols,$totalHosts) {
 
-    global $base, $siteList, $osVersions, $qTypes, $siteName, $qType, $rfText, $hSev, $mSev, $lSev;
+    global $siteList, $osVersions, $qTypes, $siteName, $qType, $rfText, $hSev, $mSev, $lSev, $webdir;
 
     $rC = $hostCount = $hSev = $mSev = $lSev = $cinToday = 0;
     $site = explode("||", $siteList[$siteName]);
@@ -580,7 +582,7 @@ function processQuery($theQuery,$theCols,$totalHosts) {
                   \r</tr>\n";
 
             $helper = "\r<tr>\n
-                       \r<td align=center colspan=4><img src=pt.png><br><br></td>\n
+                       \r<td align=center colspan=4><img src=$webdir/pt.png><br><br></td>\n
                        \r</tr>\n";
 
             echo "</table>\n";
