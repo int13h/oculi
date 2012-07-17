@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS host_info (
   age			DATETIME,
   status		TINYINT NOT NULL DEFAULT 1,
   location		TINYINT NOT NULL DEFAULT 0,
+  alerts		TINYINT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (hostname),
   INDEX timestamp (timestamp),
   INDEX ip (ip),
