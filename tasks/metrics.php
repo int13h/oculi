@@ -27,31 +27,11 @@ $base = dirname(__FILE__);
 include "$base/config.php";
 include "$base/functions.php";
 $entryDate = date('Y-m-d');
+$alertDays = 3;
+$alertList = array();
 
 // Check DB connection
 cCheck();
-
-// Locations
-$siteList = array(
-                 'AK'	=> "Akerley||10.9.%.%",
-                 'AM'	=> "Amherst||10.30.%.%",
-                 'AN'	=> "AVCM||10.25.%.%",
-                 'CO'	=> "AVCL||10.41.%.%",
-                 'BU'	=> "Burridge||10.39.%.%",
-                 'CU'	=> "Cumberland||10.36.%.%",
-                 'DI'	=> "Digby||10.20.%.%",
-                 'DW'	=> "Dartmouth||10.69.%.%",
-                 'IN'	=> "Institute||10.13.%.%",
-                 'KI'	=> "Kingstec||10.17.%.%",
-                 'LU'	=> "Lunenburg||10.15.%.%",
-                 'MA'	=> "Marconi||10.37.%.%",
-                 'PI'	=> "Pictou||10.19.%.%",
-                 'SH'   => "Shelburne||10.11.%.%",
-                 'ST'	=> "Strait Area||10.21.%.%",
-                 'TR'	=> "Truro||10.43.%.%",
-                 'NSCC'	=> "Servers||10.%.1.%",
-                 'XX'	=> "All NSCC||Null"
-);
 
 // OS Versions
 $osVersions = array(
@@ -250,7 +230,7 @@ function doInserts($type,$data) {
 
 function processQuery($theQuery, $qType) {
 
-    global $siteList, $osVersions, $hSev, $mSev, $lSev;
+    global $alertDays, $alertList, $osVersions, $hSev, $mSev, $lSev;
 
     $rC = $hostCount = $hSev = $mSev = $lSev = $cinToday = 0;
 
@@ -291,12 +271,20 @@ function processQuery($theQuery, $qType) {
             $dayDiffs = array($assig_timediff,$avsig_timediff,$ls_timediff,$avlc_timediff);
             $rowSev = avSev($dayDiffs);
 
-            $avMetrics[] = substr($hostname, 0,2) . "||" . $rowSev;     
+            $avMetrics[] = substr($hostname, 0,2) . "||" . $rowSev;
+
+            // Add to notification list
+            if ($rowSev == 'h_sev' && $avlc_timediff <= $alertDays) {
+                $alertList[] = "av" . "||" . $hostname . "||1";
+            } else {
+                $alertList[] = "av" . "||" . $hostname . "||0";
+            }
+
         }
 
         $avMetrics = array_count_values($avMetrics);
         doInserts($qType,$avMetrics);
-
+          
     }
 
     // Updates
@@ -396,7 +384,12 @@ function processQuery($theQuery, $qType) {
             $checkIn = date("m-d H:i", strtotime($n_stamp[$r]));
             
             $osMetrics[] = substr($n_host[$r], 0,2) . "||" . $rowSev;
-            
+
+            if ($rowSev == 'h_sev' && $ci_timediff <= $alertDays) {
+                $alertList[] = "os" . "||" . $n_host[$r] . "||1";
+            } else {
+                $alertList[] = "os" . "||" . $n_host[$r] . "||0";
+            }
         }
 
         $osMetrics = array_count_values($osMetrics);
@@ -435,7 +428,30 @@ function doQuery($qType) {
     }
 }
 
+function helpDesk($alertList) {
+
+    foreach ($alertList as $comp) {    
+        list($type,$host,$status) = explode("||",$comp);
+        
+        // Host is OK: Reset any existing counters if present
+        if ($status == 0) {
+             mysql_query("UPDATE host_info SET alert_$type = 0 WHERE hostname = \"$host\""); 
+        }
+
+        // Host is NOT OK: Increment any existing alert types and then increment running alert counter
+        if ($status == 1) {
+            mysql_query("UPDATE host_info SET alert_$type = alert_$type + 1 WHERE hostname = \"$host\"");
+            mysql_query("UPDATE host_info SET alerts = alerts + 1 WHERE hostname = \"$host\"");
+        }
+    }
+
+}
+
 doQuery("os");
 doQuery("av");
+
+if (count($alertList) > 0) {
+    helpDesk($alertList);
+}
 
 ?>
