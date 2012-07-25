@@ -428,20 +428,24 @@ function doQuery($qType) {
     }
 }
 
-function helpDesk($alertList) {
+function processAlerts($alertList) {
+
+    // Reset all client alert states
+    mysql_query("UPDATE host_info SET alert_status = 0");
 
     foreach ($alertList as $comp) {    
         list($type,$host,$status) = explode("||",$comp);
         
         // Host is OK: Reset any existing counters if present
         if ($status == 0) {
-             mysql_query("UPDATE host_info SET alert_$type = 0 WHERE hostname = \"$host\""); 
+             mysql_query("UPDATE host_info SET alert_$type = 0 WHERE hostname = \"$host\"");
         }
 
         // Host is NOT OK: Increment any existing alert types and then increment running alert counter
         if ($status == 1) {
+            mysql_query("UPDATE host_info SET alert_status = 1 WHERE hostname = \"$host\"");
             mysql_query("UPDATE host_info SET alert_$type = alert_$type + 1 WHERE hostname = \"$host\"");
-            mysql_query("UPDATE host_info SET alerts = alerts + 1 WHERE hostname = \"$host\"");
+            mysql_query("UPDATE host_info SET alert_history = alert_history + 1 WHERE hostname = \"$host\"");
         }
     }
 
@@ -451,7 +455,7 @@ doQuery("os");
 doQuery("av");
 
 if (count($alertList) > 0) {
-    helpDesk($alertList);
+    processAlerts($alertList);
 }
 
 ?>
