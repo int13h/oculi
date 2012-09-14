@@ -6,4 +6,9 @@ $dbName = 'oculi';
 $dbUser = 'patches';
 $dbPass = '0123443210';
 
+// Email (helpdesk)
+$prePrefix      = 'test';
+$domain         = 'test.ca';
+$recipient      = 'test@helpdesk.ca';
+
 ?>
