@@ -9,10 +9,9 @@ $r2 = mysql_query($q2);
 list($chartName1,$chartQuery1,$chartCol1) = explode('||', $chartArgs[0]);
 list($chartName2,$chartQuery2,$chartCol2) = explode('||', $chartArgs[1]);
 
-
 $i = 0;
 
-$av = $os = array();
+$av = $os = $max = array();
 
 while ($row = mysql_fetch_row($r1)) {    
     $av[$row[0]] = $row[1];
@@ -23,6 +22,10 @@ while ($row = mysql_fetch_row($r2)) {
     $os[$row[0]] = $row[1];
     $lbl[]       = $row[0];
 }
+
+$max[] = max($av);
+$max[] = max($os);
+$ymax = max($max) + 20;
 
 $lbl = array_unique($lbl);
 asort($lbl);
@@ -52,7 +55,6 @@ $bar .= ']';
 $tooltips = rtrim($tooltips,',');
 $tooltips .= ']';
 $xlabel = rtrim($xlabel,',');
-
 // Chart Logic
 
 echo "<br><canvas id=daily width=\"950\" height=\"250\">[No canvas support]</canvas>";
@@ -61,6 +63,15 @@ echo "\r<script>";
 
 echo "
     function createDaily () {
+    var line1 = new RGraph.Line('daily', [10,10]);
+    line1.Set('chart.gutter.top', 30);
+    line1.Set('chart.gutter.left', 60);
+    line1.Set('chart.gutter.right', 40);
+    line1.Set('chart.gutter.bottom', 70);
+    line1.Set('chart.colors', ['rgba(204, 0, 0, 0.5)']);
+    line1.Set('chart.linewidth', 1);
+    line1.Set('chart.ylabels', false);
+    line1.Set('chart.ymax', $ymax);
     var bar1 = new RGraph.Bar('daily', $bar);
     bar1.Set('chart.title', 'Number of Critical Devices');
     bar1.Set('chart.yaxispos', 'left');
@@ -68,6 +79,7 @@ echo "
     bar1.Set('chart.background.grid.autofit', true);
     bar1.Set('chart.background.grid.vlines', true);
     bar1.Set('chart.background.grid.width', .5);
+    bar1.Set('chart.background.grid.autofit.align', true);
     bar1.Set('chart.labels', [$xlabel]);
     bar1.Set('chart.text.angle', 45);
     bar1.Set('chart.colors', ['$chartCol1', '$chartCol2']);
@@ -79,14 +91,16 @@ echo "
     bar1.Set('chart.text.size', 8);
     bar1.Set('chart.text.font', 'verdana');
     bar1.Set('chart.ylabels.count', 10);
-    bar1.Set('chart.background.grid.autofit.align', true);
-    bar1.Set('chart.variant', '3d');
     bar1.Set('chart.tooltips', $tooltips);
+    bar1.Set('chart.ymax', $ymax);
     bar1.Set('chart.key', ['$chartName1', '$chartName2']);
     bar1.Set('chart.key.position', 'gutter');
     bar1.Set('chart.key.position.y', bar1.canvas.height - 8);
     bar1.Set('chart.key.text.size', 8);
     bar1.Set('chart.key.position.gutter.boxed', false);
+    bar1.Set('chart.hmargin.grouped', 2);
+    line1.Set('chart.background.grid', false);
+    line1.Draw();
     bar1.Draw();
     }
     createDaily();";
