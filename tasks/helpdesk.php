@@ -60,10 +60,16 @@ while ($a = mysql_fetch_row($groupQuery)) {
 
     unset($hostQuery);
 
-    $hostQuery = mysql_query("SELECT hostname, inet_ntoa(ip), alert_os, alert_av, alert_status, alert_history 
+    $_hostQuery = mysql_query("SELECT hostname, inet_ntoa(ip), alert_os, alert_av, alert_status, alert_history 
                               FROM host_info
                               WHERE alert_status > 0
                               AND (hostname LIKE \"${prefix}%\" OR hostname LIKE \"$prePrefix$prefix%\")");
+
+    $hostQuery = mysql_query("SELECT hostname, inet_ntoa(ip), alert_os, alert_av, alert_status, alert_history
+                              FROM host_info
+                              WHERE alert_status > 0
+                              AND hostname LIKE \"${prefix}%\"");
+
 
     $problems = mysql_num_rows($hostQuery);
 
@@ -82,8 +88,5 @@ while ($a = mysql_fetch_row($groupQuery)) {
     }
 
 }
-
-
-
 
 ?>

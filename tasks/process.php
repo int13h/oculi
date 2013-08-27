@@ -165,6 +165,23 @@ function processINV($line) {
     return $answer;
 }
 
+function processFlash($line) {
+    $x			= explode("||", $line);
+    $flashplayer	= str_replace("FlashPlayer: ", "", $x[1]); 
+    $flashplayeractivex = str_replace("FlashPlayerActiveX: ", "", $x[2]);
+    $flashplayerplugin	= str_replace("FlashPlayerPlugin: ", "", $x[3]);
+    $answer		= "$flashplayer||$flashplayeractivex||$flashplayerplugin";
+    
+    return $answer;  
+}
+
+function processJava($line) {
+    $x			= explode("||", $line);
+    $browserjava	= str_replace("BrowserJavaVersion: ", "", $x[1]);
+    
+    return $browserjava;
+}
+
 function processWinver($matches) {
 
     // Versions
@@ -201,11 +218,15 @@ function processFile($file,$time,$host,$timestamp) {
     $updateResult   = array();
     $ipResult       = "0.0.0.0,FF:FF:FF:FF:FF:FF";
     $avResult       = "0,0,0000-00-00,0,0000-00-00,0000-00-00";
+    $flashResult    = "Unknown||Unknown||Unknown";
+    $javaResult     = "Unknown";
     $osVersion      = 0;
     $ipHit          = 0;
     $service_pack   = 0;
     $hostState      = 0;
     $location	    = 0;
+    $user_id	    = 'Unknown';
+    $admin_group    = 'Unknown';
 
     // Check sanity of file (this needs to be more robust) 
     if(filesize($file) < 1000) {
@@ -247,9 +268,11 @@ function processFile($file,$time,$host,$timestamp) {
                         // See if it is enabled
                         $isEnabled = explode(",", $line);
                         if ($isEnabled[2] == "TRUE") {
-                            $ipResult = processIP($line);
-                            $ipHit = 1;
-                            break;
+                            if (!preg_match("/^00:(0|1|5)(0|5|(c|C)):(1|2|5|6)(4|6|9)/", $isEnabled[3])) {
+                                $ipResult = processIP($line);
+                                $ipHit = 1;
+                                break;
+                            }
                         } else {
                             break;
                         }
@@ -266,13 +289,27 @@ function processFile($file,$time,$host,$timestamp) {
                     break;
         
                 case "AV Result":
-                    // Match AV line
                     $avResult = processAV($line);
                     break;
 
                 case "Inventory":
-                    // Match asset line
                     $invResult = processINV($line);
+                    break;
+
+                case "LastLoggedOnUser":
+                    $user_id = addslashes(str_replace("LastLoggedOnUser,", "", $line));
+                    break;
+
+                case "InAdminGroup":
+                    $admin_group = str_replace("InAdminGroup,", "", $line);
+                    break;
+              
+                case "Flash":
+                    $flashResult = processFlash($line);
+                    break;
+
+                case "Java":
+                    $javaResult = processJava($line);
                     break;
 
                 default:
@@ -336,21 +373,33 @@ function processFile($file,$time,$host,$timestamp) {
                                              avsig_version=\"$avsig_version\",avsig_applied=\"$avsig_applied\",
                                              last_scan=\"$last_scan\"");
 
+        // Software versions
+        list ($flashplayer,$flashplayeractivex,$flashplayerplugin) = explode("||", $flashResult);
+        $browserjava = $javaResult;
+
+        mysql_query("INSERT INTO software (timestamp,hostname,flashplayer,flashplayeractivex,flashplayerplugin,browserjava)
+
+                     VALUES (\"$timestamp\",\"$host\",\"$flashplayer\",\"$flashplayeractivex\",\"$flashplayerplugin\",\"$browserjava\")
+
+                     ON DUPLICATE KEY UPDATE timestamp=\"$timestamp\",flashplayer=\"$flashplayer\",
+                                             flashplayeractivex=\"$flashplayeractivex\",
+                                             flashplayerplugin=\"$flashplayerplugin\",browserjava=\"$browserjava\"");
+
         // Asset Info insert
 
         if ($invResult) {
             list ($manufacturer,$model,$serial_number,$asset_tag,$processor,$frequency,$memory,$storage) = explode(',', $invResult);
 
             mysql_query("INSERT INTO asset (timestamp,hostname,manufacturer,model,serial_number,
-                                            asset_tag,processor,frequency,memory,storage)
+                                            asset_tag,processor,frequency,memory,storage,user_id,admin_group)
 
                          VALUES (\"$timestamp\",\"$host\",\"$manufacturer\",\"$model\",\"$serial_number\",
-                                 \"$asset_tag\",\"$processor\",\"$frequency\",\"$memory\",\"$storage\")
+                                 \"$asset_tag\",\"$processor\",\"$frequency\",\"$memory\",\"$storage\",\"$user_id\",\"$admin_group\")
 
                          ON DUPLICATE KEY UPDATE timestamp=\"$timestamp\",manufacturer=\"$manufacturer\",model=\"$model\",
                                                  serial_number=\"$serial_number\",asset_tag=\"$asset_tag\",
                                                  processor=\"$processor\",frequency=\"$frequency\",memory=\"$memory\",
-                                                 storage=\"$storage\"");
+                                                 storage=\"$storage\",user_id=\"$user_id\",admin_group=\"$admin_group\"");
         }
 
     } else {

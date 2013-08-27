@@ -271,7 +271,25 @@ function processQuery($theQuery, $qType) {
             $dayDiffs = array($assig_timediff,$avsig_timediff,$ls_timediff,$avlc_timediff);
             $rowSev = avSev($dayDiffs);
 
-            $avMetrics[] = substr($hostname, 0,2) . "||" . $rowSev;
+            // Assign certain IP's to other groups
+            $groupMappings = array(
+                                  '40' => "CC",
+                                  '41' => "CC",
+                                  '42' => "CC",
+                                   '1' => "NS",
+            );
+ 
+            $ocTest = explode(".", $ip);
+            $groupKeys = array_keys($groupMappings);
+            $groupTest = array_search("$ocTest[2]", $groupKeys);
+              
+            if($groupTest !== FALSE) {
+                $hostGroup = $groupMappings[$groupKeys[$groupTest]];
+            } else {
+                $hostGroup = substr($hostname, 0,2);
+            }
+
+            $avMetrics[] = $hostGroup . "||" . $rowSev;
 
             // Add to notification list
             if ($rowSev == 'h_sev' && $avlc_timediff <= $alertDays) {
@@ -283,6 +301,7 @@ function processQuery($theQuery, $qType) {
         }
 
         $avMetrics = array_count_values($avMetrics);
+        ksort($avMetrics);
         doInserts($qType,$avMetrics);
           
     }
@@ -382,8 +401,26 @@ function processQuery($theQuery, $qType) {
             $rowSev = osSev($tuesDiff);
             $tsKey = date("U", strtotime($n_stamp[$r]));
             $checkIn = date("m-d H:i", strtotime($n_stamp[$r]));
+
+            // Assign certain IP's to other groups
+            $groupMappings = array(
+                                  '40' => "CC",
+                                  '41' => "CC",
+                                  '42' => "CC",
+                                   '1' => "NS",
+            );
+
+            $ocTest = explode(".", $n_ip[$r]);
+            $groupKeys = array_keys($groupMappings);
+            $groupTest = array_search("$ocTest[2]", $groupKeys);
+             
+            if($groupTest !== FALSE) {
+                $hostGroup = $groupMappings[$groupKeys[$groupTest]];
+            } else {
+                $hostGroup = substr($n_host[$r], 0,2);
+            }
             
-            $osMetrics[] = substr($n_host[$r], 0,2) . "||" . $rowSev;
+            $osMetrics[] = $hostGroup . "||" . $rowSev;
 
             if ($rowSev == 'h_sev' && $ci_timediff <= $alertDays) {
                 $alertList[] = "os" . "||" . $n_host[$r] . "||1";
@@ -393,14 +430,14 @@ function processQuery($theQuery, $qType) {
         }
 
         $osMetrics = array_count_values($osMetrics);
+        ksort($osMetrics);
         doInserts($qType,$osMetrics);
     }
 
 }
 
 
-function doQuery($qType) {
-   
+function doQuery($qType) {   
     $theQueries = array(
         "av" => "SELECT h.timestamp, h.mac, h.ip, h.hostname, engine_version, assig_version, assig_applied, avsig_version, avsig_applied, last_scan
                  FROM av 
@@ -415,7 +452,6 @@ function doQuery($qType) {
     );
 
     $theQuery = mysql_query($theQueries[$qType]);
-
     // Show Query
     //echo $theQueries[$qType];
 
@@ -425,6 +461,7 @@ function doQuery($qType) {
         exit(0);
     } else {
         processQuery($theQuery,$qType);
+        
     }
 }
 

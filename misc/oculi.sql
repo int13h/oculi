@@ -55,6 +55,21 @@ CREATE TABLE IF NOT EXISTS av (
   INDEX last_scan (last_scan))
   ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS software (
+  timestamp             DATETIME,
+  hostname              VARCHAR(255),
+  flashplayer           VARCHAR(20) NOT NULL DEFAULT 'unknown',
+  flashplayeractivex    VARCHAR(20) NOT NULL DEFAULT 'unknown',
+  flashplayerplugin     VARCHAR(20) NOT NULL DEFAULT 'unknown',
+  browserjava           VARCHAR(20) NOT NULL DEFAULT 'unknown',
+  PRIMARY KEY (hostname),
+  INDEX timestamp (timestamp),
+  INDEX flashplayer (flashplayer),
+  INDEX flashplayeractivex (flashplayeractivex),
+  INDEX flashplayerplugin (flashplayerplugin),
+  INDEX browserjava (browserjava))
+  ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS asset (
   timestamp             DATETIME,
   hostname              VARCHAR(255),
@@ -66,7 +81,8 @@ CREATE TABLE IF NOT EXISTS asset (
   frequency		FLOAT(3,2) NOT NULL DEFAULT 0,
   memory                SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   storage		SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-  user_id               VARCHAR(8) NOT NULL DEFAULT 'unknown',
+  user_id               VARCHAR(255) NOT NULL DEFAULT 'unknown',
+  admin_group		TEXT,
   ooo                   ENUM('no','yes') DEFAULT 'no',
   PRIMARY KEY (hostname),
   INDEX timestamp (timestamp),
