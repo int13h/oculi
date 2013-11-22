@@ -195,7 +195,8 @@ function processWinver($matches) {
                    7	=> "Microsoft Windows Server 2008 Standard",
                    8	=> "Microsoft Windows Server 2008 R2 Enterprise",
                    9	=> "Microsoft Windows Server 2008 R2 Standard",
-                   10	=> "Microsoft Windows Embedded Standard"
+                   10	=> "Microsoft Windows Embedded Standard",
+                   11   => "Microsoft Windows 8.1 Pro",
     );
      
     list($_osVersion, $osStatus) = explode("|", $matches);
