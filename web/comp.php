@@ -184,10 +184,11 @@ function timeDiff($stamp) {
 function getOS($n) {
 
     global $osVersions;
+    $re = "(^$n{1},|,$n{1}$)";
 
     foreach ($osVersions as $hs => $os) {
 
-        if (preg_match("/(^|,)($n)/", $hs)) {
+        if (preg_match("/$re/i", $hs, $matches)) {
             $answer = $os;
             return $answer;
         }
