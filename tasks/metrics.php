@@ -36,6 +36,11 @@ cCheck();
 // OS Versions
 $osVersions = array(
                    "4,5"  => "Windows 7",
+                   "17,18" => "Windows 10",
+                   "11,12" => "Windows 8.1",
+                   "15,16" => "Server 2012 R2",
+                   "13,14" => "Server 2012",
+                   "21,22" => "Windows 8",
                    "6,7"  => "Server 2008",
                    "8,9"  => "Server 2008 R2",
                    "1"    => "Windows XP",

@@ -41,6 +41,11 @@ $qTypes = array(
 // OS Versions
 $osVersions = array(
                    "4,5"  => "Windows 7",
+		   "17,18" => "Windows 10",
+		   "11,12" => "Windows 8.1",
+		   "15,16" => "Server 2012 R2",
+		   "13,14" => "Server 2012",
+		   "21,22" => "Windows 8",
                    "6,7"  => "Server 2008",
                    "8,9"  => "Server 2008 R2",
                    "1"    => "Windows XP",
@@ -297,32 +302,21 @@ function processQuery($theQuery,$theCols,$totalHosts) {
 
             $char = getChar($rowSev);
 
-            if ($status == 1) {
-                $html .= "<tr class=$rowSev name=row-$rC id=row-$rC>\n
-                          <td class=sort_l sorttable_customkey=\"$rowSev\"><div class=\"$rowSev\">$char</div>$lclass</td>\n
-                          <td class=sort_l>$hostname</td>\n
-                          <td class=sort_l sorttable_customkey=\"$ip_long\">$ip</td>
-                          <td class=sort_err colspan=8>Error code 1: General failure processing client output. Run script manually on client and examine output.</td>\n
-                          <td class=sort_r sorttable_customkey=\"$tsKey\">$checkIn</td>\n
-                          <td class=sort_r>$avlc_timediff</td>\n
-                          </tr>\n";
-            } else {
-                $html .= "<tr class=$rowSev name=row-$rC id=row-$rC>\n
-                          <td class=sort_l sorttable_customkey=\"$rowSev\"><div class=\"$rowSev\">$char</div>$lclass</td>\n
-                          <td class=sort_l>$hostname</td>\n
-                          <td class=sort_l sorttable_customkey=\"$ip_long\">$ip</td>
-                          <td class=sort_r sorttable_customkey=\"$assig_index\">$assig_version</td>\n
-                          <td class=sort_r>$asst</td>\n
-                          <td class=sort_r>$assig_timediff</td>\n
-                          <td class=sort_r sorttable_customkey=\"$avsig_index\">$avsig_version</td>\n
-                          <td class=sort_r>$avst</td>\n
-                          <td class=sort_r>$avsig_timediff</td>\n
-                          <td class=sort_r>$lst</td>\n
-                          <td class=sort_r>$ls_timediff</td>\n
-                          <td class=sort_r sorttable_customkey=\"$tsKey\">$checkIn</td>\n
-                          <td class=sort_r>$avlc_timediff</td>\n
-                          </tr>\n";
-            }
+            $html .= "<tr class=$rowSev name=row-$rC id=row-$rC>\n
+                      <td class=sort_l sorttable_customkey=\"$rowSev\"><div class=\"$rowSev\">$char</div>$lclass</td>\n
+                      <td class=sort_l>$hostname</td>\n
+                      <td class=sort_l sorttable_customkey=\"$ip_long\">$ip</td>
+                      <td class=sort_r sorttable_customkey=\"$assig_index\">$assig_version</td>\n
+                      <td class=sort_r>$asst</td>\n
+                      <td class=sort_r>$assig_timediff</td>\n
+                      <td class=sort_r sorttable_customkey=\"$avsig_index\">$avsig_version</td>\n
+                      <td class=sort_r>$avst</td>\n
+                      <td class=sort_r>$avsig_timediff</td>\n
+                      <td class=sort_r>$lst</td>\n
+                      <td class=sort_r>$ls_timediff</td>\n
+                      <td class=sort_r sorttable_customkey=\"$tsKey\">$checkIn</td>\n
+                      <td class=sort_r>$avlc_timediff</td>\n
+                      </tr>\n";
         }
 
         $html .= "</table>\n";
